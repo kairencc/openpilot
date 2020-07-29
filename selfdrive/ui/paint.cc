@@ -368,11 +368,14 @@ static void ui_draw_world(UIState *s) {
   // Draw lane edges and vision/mpc tracks
   ui_draw_vision_lanes(s);
 
-  if (scene->lead_data[0].getStatus()) {
-    draw_lead(s, scene->lead_data[0]);
-  }
-  if (scene->lead_data[1].getStatus() && (std::abs(scene->lead_data[0].getDRel() - scene->lead_data[1].getDRel()) > 3.0)) {
-    draw_lead(s, scene->lead_data[1]);
+  // Draw lead indicators if openpilot is handling longitudinal
+  if (s->longitudinal_control) {
+    if (scene->lead_data[0].getStatus()) {
+      draw_lead(s, scene->lead_data[0]);
+    }
+    if (scene->lead_data[1].getStatus() && (std::abs(scene->lead_data[0].getDRel() - scene->lead_data[1].getDRel()) > 3.0)) {
+      draw_lead(s, scene->lead_data[1]);
+    }
   }
   nvgRestore(s->vg);
 }
@@ -853,8 +856,6 @@ void ui_nvg_init(UIState *s) {
 
   assert(s->vg);
 
-  s->font_courbd = nvgCreateFont(s->vg, "courbd", "../assets/fonts/courbd.ttf");
-  assert(s->font_courbd >= 0);
   s->font_sans_regular = nvgCreateFont(s->vg, "sans-regular", "../assets/fonts/opensans_regular.ttf");
   assert(s->font_sans_regular >= 0);
   s->font_sans_semibold = nvgCreateFont(s->vg, "sans-semibold", "../assets/fonts/opensans_semibold.ttf");
